@@ -4,9 +4,9 @@ from routes.load_supabase import load_supabase
 import pandas as pd
 
 supabase = load_supabase()
-encerrar_investmento_bp = Blueprint('encerrar_investmento', __name__)
+encerrar_investmento_bp = Blueprint('encerrar_investimento', __name__)
 
-@encerrar_investmento_bp.route('/encerrar_investmento', methods=['GET', 'POST'])
+@encerrar_investmento_bp.route('/encerrar_investimento', methods=['GET', 'POST'])
 def encerrar_investimento():
     user_id = session.get('user_id')
     if not user_id:

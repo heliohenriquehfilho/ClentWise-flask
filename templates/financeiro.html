@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>{{ title if title else "ClientWise" }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">{{ t("title") }}</h1>
+        <p class="text-muted">Gerencie suas finanças e despesas de forma eficiente</p>
+    </div>
+
+    <!-- Navegação de abas -->
+    <ul class="nav nav-pills justify-content-center mb-4">
+        <li class="nav-item">
+            <a class="nav-link {% if aba=='register' %}active{% endif %}"
+                href="{{ url_for('financeiro.financeiro', aba='register') }}">
+                {{ t("menu_register_expense") }}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if aba=='insights' %}active{% endif %}"
+                href="{{ url_for('financeiro.financeiro', aba='insights') }}">
+                {{ t("menu_financial_insights") }}
+            </a>
+        </li>
+    </ul>
+
+    {% if aba == 'register' %}
+    <!-- Formulário de cadastro de despesas -->
+    <div class="card shadow mb-5">
+        <div class="card-header bg-primary text-white text-center">
+            <h2 class="h5">{{ t("register_expense_button") }}</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('financeiro.financeiro', aba='register') }}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">{{ t("select_expense") }}</label>
+                        <select name="tipo" class="form-select" required>
+                            <option value="" disabled selected>{{ t("select_option") }}</option>
+                            <option value="aluguel">Aluguel</option>
+                            <option value="energia">Energia Elétrica</option>
+                            <option value="agua">Água</option>
+                            <option value="internet">Internet</option>
+                            <option value="alimentacao">Alimentação</option>
+                            <option value="transporte">Transporte</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">{{ t("descricao") }}</label>
+                        <input type="text" name="descricao" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">{{ t("fornecedor") }}</label>
+                        <input type="text" name="fornecedor" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">{{ t("expense_value") }}</label>
+                        <input type="number" name="valor" step="0.01" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">{{ t("pagamento") }}</label>
+                        <select name="pagamento" class="form-select" required>
+                            <option value="" disabled selected>{{ t("select_option") }}</option>
+                            <option value="pix">Pix</option>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="credito">Credito</option>
+                            <option value="debito">Debito</option>
+                            <option value="boleto">Boleto</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">{{ t("payment_date") }}</label>
+                        <input type="date" name="data" class="form-control" required>
+                    </div>
+                </div>
+
+                <!-- Campos adicionais (dinâmicos via JS) -->
+                <div id="extraFields" class="row g-3 mt-3"></div>
+
+                <div class="mt-4 text-center">
+                    <button type="submit" class="btn btn-primary px-4">
+                        {{ t("register_expense_button") }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const selectTipo = document.querySelector('select[name="tipo"]');
+        selectTipo.addEventListener('change', () => {
+            const extra = document.getElementById('extraFields');
+            if (["Fornecedor","Boleto"].includes(selectTipo.value)) {
+                extra.innerHTML = `
+                    <div class="col-md-6">
+                        <label class="form-label">${selectTipo.value}</label>
+                        <input type="text" name="fornecedor" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ t("description") }}</label>
+                        <input type="text" name="descricao" class="form-control" required>
+                    </div>`;
+            } else {
+                extra.innerHTML = '';
+            }
+        });
+    </script>
+
+    {% else %}
+    <!-- Insights financeiros -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-secondary text-white text-center">
+            <h2 class="h5">Relatório Financeiro</h2>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">{{ t("enter_month") }}</label>
+                    <select id="monthSelect" class="form-select"
+                        onchange="location.href='?aba=insights&mes='+this.value+'&ano='+document.getElementById('yearInput').value">
+                        {% for m in meses %}
+                            <option value="{{ m }}" {% if m==menu_mes %}selected{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">{{ t("year") }}</label>
+                    <input id="yearInput" type="number" class="form-control"
+                            value="{{ ano }}"
+                            onchange="location.href='?aba=insights&mes='+document.getElementById('monthSelect').value+'&ano='+this.value">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <p><strong>{{ t("sales_total").format(month=menu_mes, total=total_vendas) }}</strong></p>
+                <p><strong>{{ t("expenses_total").format(month=menu_mes, total=total_desp) }}</strong></p>
+                <p><strong>{{ t("investments_paid_total").format(month=menu_mes, total=total_inv) }}</strong></p>
+                <p><strong>{{ t("campaigns_paid_total").format(month=menu_mes, total=total_camp) }}</strong></p>
+                <p class="text-success fw-bold fs-5">{{ t("monthly_balance").format(month=menu_mes, balance=balanco) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabelas de dados -->
+    {% macro render_table(title, headers, rows) %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-secondary text-white text-center">
+                <h2 class="h5">{{ title }}</h2>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>{% for h in headers %}<th>{{ h }}</th>{% endfor %}</tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endmacro %}
+
+    {% if vendas_tabela %}
+        {{ render_table(t("sales"), ["Data", "Valor"], vendas_tabela) }}
+    {% else %}
+        <div class="alert alert-info">{{ t("no_sales") }}</div>
+    {% endif %}
+
+    {% if despesas_tabela %}
+        {{ render_table(t("expenses"), ["Data", "Valor"], despesas_tabela) }}
+    {% else %}
+        <div class="alert alert-info">{{ t("no_expenses") }}</div>
+    {% endif %}
+
+    {% if investimentos_tabela %}
+        {{ render_table(t("investment_payments"), ["Nome", "Data", "Valor"], investimentos_tabela) }}
+    {% else %}
+        <div class="alert alert-info">{{ t("no_investments") }}</div>
+    {% endif %}
+
+    {% if campanhas_tabela %}
+        {{ render_table(t("campaigns"), ["Nome", "Data Início", "Valor"], campanhas_tabela) }}
+    {% else %}
+        <div class="alert alert-info">{{ t("no_campaigns") }}</div>
+    {% endif %}
+    {% endif %}
+</div>
+
+{% endblock %}

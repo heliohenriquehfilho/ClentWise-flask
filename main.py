@@ -6,6 +6,7 @@ from routes.cadastro_cliente import cadastro_cliente_bp
 from routes.edit_cliente import editar_cliente_bp
 from flask import Flask, render_template, session
 from routes.investments import investments_bp
+from routes.financeiro import financeiro_bp
 from routes.dashboard import dashboard_bp
 from routes.finances import finances_bp
 from routes.clientes import clientes_bp
@@ -29,12 +30,13 @@ app.register_blueprint(cadastro_cliente_bp, url_prefix="/cadastro_cliente")
 app.register_blueprint(vendas_bp, url_prefix="/sales")
 app.register_blueprint(clientes_bp, url_prefix="/clientes")
 app.register_blueprint(editar_cliente_bp, url_prefix="/editar_cliente")
-app.register_blueprint(investments_bp, url_prefix="/investments")
+app.register_blueprint(investments_bp)
 app.register_blueprint(atualizar_investmentos_bp, url_prefix="/atualizar_investmentos")
-app.register_blueprint(encerrar_investmento_bp, url_prefix="/encerrar_investmento")
-app.register_blueprint(deletar_investimento_bp, url_prefix="/deletar_investimento")
-app.register_blueprint(cadastrar_investmento_bp, url_prefix="/cadastrar_investimento")
+app.register_blueprint(encerrar_investmento_bp)
+app.register_blueprint(deletar_investimento_bp)
+app.register_blueprint(cadastrar_investmento_bp)
 app.register_blueprint(finances_bp, url_prefix="/finances")
+app.register_blueprint(financeiro_bp)
  
 @app.route('/')
 def index():

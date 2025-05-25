@@ -5,9 +5,9 @@ from routes.load_supabase import load_supabase
 import pandas as pd
 
 supabase = load_supabase()
-cadastrar_investmento_bp = Blueprint('cadastrar_investmento', __name__)
+cadastrar_investmento_bp = Blueprint('cadastrar_investimento', __name__)
 
-@cadastrar_investmento_bp.route('/cadastrar_investmento', methods=['GET', 'POST'])
+@cadastrar_investmento_bp.route('/cadastrar_investimento', methods=['GET', 'POST'])
 def cadastrar_investimento():
     user_id = session.get('user_id')
 
@@ -45,8 +45,16 @@ def cadastrar_investimento():
         investimentos_ativos = investimentos_df[investimentos_df['encerrado'] == False]
         investimento_encerrado = investimentos_df[investimentos_df['encerrado'] == True]
 
-        return render_template(
-            'investments.html', 
-            investimentos_df=investimentos_ativos.to_dict('records'),
-            investimento_encerrado=investimento_encerrado.to_dict('records'), 
-            investimento=investimento)
+        pagamentos_df = pd.DataFrame(investimento["historico_pagamentos"])
+        pagamentos_vazios = pagamentos_df.empty
+
+
+
+    return render_template(
+        'investments.html', 
+        investimentos_df=investimentos_ativos.to_dict('records'),
+        investimento_encerrado=investimento_encerrado.to_dict('records'), 
+        investimento=investimento,
+        pagamentos=pagamentos_df,
+        pagamentos_vazios=pagamentos_vazios
+    )
