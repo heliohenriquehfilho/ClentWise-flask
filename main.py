@@ -8,7 +8,6 @@ from flask import Flask, render_template, session
 from routes.investments import investments_bp
 from routes.financeiro import financeiro_bp
 from routes.dashboard import dashboard_bp
-from routes.finances import finances_bp
 from routes.clientes import clientes_bp
 from routes.register import register_bp
 from routes.vendas import vendas_bp
@@ -35,7 +34,6 @@ app.register_blueprint(atualizar_investmentos_bp, url_prefix="/atualizar_investm
 app.register_blueprint(encerrar_investmento_bp)
 app.register_blueprint(deletar_investimento_bp)
 app.register_blueprint(cadastrar_investmento_bp)
-app.register_blueprint(finances_bp, url_prefix="/finances")
 app.register_blueprint(financeiro_bp)
  
 @app.route('/')
